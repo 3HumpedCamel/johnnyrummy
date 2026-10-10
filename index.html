@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Johnny Rummy</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        
+        <!-- Slim Top Header -->
+        <div id="top-bar">
+            <h1>Johnny Rummy</h1>
+            
+            <div id="bot-cluster">
+                <!-- Bot avatars injected here -->
+            </div>
+
+            <div class="top-controls">
+                <button id="restart-game-btn">Restart Game</button>
+                <button id="high-scores-btn">Top 10</button>
+                <button id="view-rules-btn">Rules</button>
+                <button id="view-scores-btn">Scores</button>
+                <span class="round-badge">Round <span id="round-number">1</span>/8</span>
+                <select id="theme-select">
+                    <option value="theme-default">Default Classic</option>
+                    <option value="theme-dark">Dark Neon</option>
+                    <option value="theme-vintage">Vintage Cream</option>
+                    <option value="theme-geology">Geology (Custom)</option>
+                </select>
+            </div>
+        </div>
+        
+        <!-- Fixed Table Area (No Scrollbars) -->
+        <div id="table-area">
+            <div id="table-scaler">
+                <div id="melds-container">
+                    <!-- Melds injected here -->
+                </div>
+            </div>
+
+            <!-- Interactive Board Controls -->
+            <div id="board-actions">
+                <div id="draw-deck" class="table-prop" title="Draw Card">
+                    <span>DRAW</span>
+                </div>
+                <div id="pass-coin" class="table-prop disabled" title="End Turn">
+                    <div class="coin-inner">DONE</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Area -->
+        <div id="player-area">
+            <div class="player-header">
+                <h2>Your Hand</h2>
+                <div class="header-actions">
+                    <button id="reset-turn-btn">Reset Turn Changes</button>
+                    <div id="status-message">Your turn! Play melds on the table.</div>
+                </div>
+            </div>
+            <div id="player-hand" class="hand">
+                <!-- Player cards -->
+            </div>
+        </div>
+        
+        <!-- Hidden Rules overlay -->
+        <div id="rules-modal" style="display: none;" class="modal-overlay">
+            <div class="modal-content">
+                <h2>How to Play</h2>
+                <div class="rules-text">
+                    <p><strong>Goal:</strong> Be the first to empty your hand by playing valid melds to the table.</p>
+                    <p><strong>Melds:</strong> 3+ cards of the same rank (Book) OR 3+ cards of the same suit in sequence (Run).</p>
+                    <p><strong>Turns:</strong> Draw a card, play any number of cards to new or existing melds, and click DONE.</p>
+                    <p><strong>Jokers:</strong> Wild cards. You can swap a natural card from your hand for a Joker on the table!</p>
+                    <p><strong>Scoring:</strong> When a player goes out, others get penalty points for cards left in their hand. The lowest score after 8 rounds wins.</p>
+                </div>
+                <button id="close-rules-btn">Close</button>
+            </div>
+        </div>
+
+        <!-- Hidden Scoreboard overlay -->
+        <div id="scoreboard-modal" style="display: none;" class="modal-overlay">
+            <div class="modal-content">
+                <h2>Scoreboard</h2>
+                <div id="score-table-container"></div>
+                <button id="close-modal-btn">Continue</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden High Scores overlay -->
+        <div id="highscores-modal" style="display: none;" class="modal-overlay">
+            <div class="modal-content">
+                <h2>Top 10 (Lowest) Scores</h2>
+                <ol id="high-scores-list" class="rules-text" style="padding-left: 20px; text-align: left;"></ol>
+                <button id="close-highscores-btn">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

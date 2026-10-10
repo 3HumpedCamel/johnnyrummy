@@ -1,0 +1,462 @@
+:root {
+    --card-w: 70px;
+    --card-h: 100px;
+}
+
+body {
+    font-family: sans-serif;
+    background-color: #1a1a1a;
+    color: white;
+    margin: 0;
+    padding: 20px;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#game-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    background-color: #2b7a0b;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* --- Slim Top Bar & Bot Avatars --- */
+#top-bar {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    z-index: 10;
+}
+
+#top-bar h1 {
+    margin: 0;
+    font-size: 20px;
+    letter-spacing: 1px;
+}
+
+#bot-cluster {
+    display: flex;
+    gap: 20px;
+}
+
+.bot-avatar-container {
+    display: flex;
+    align-items: center;
+    background: rgba(0,0,0,0.3);
+    border-radius: 20px;
+    padding: 2px 10px 2px 2px;
+    gap: 8px;
+}
+
+.bot-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #555;
+    border: 2px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    font-weight: bold;
+    position: relative;
+}
+
+.bot-name {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.bot-badge {
+    position: absolute;
+    top: -5px;
+    right: -8px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    font-size: 11px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.top-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.round-badge {
+    font-weight: bold;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+/* --- Table Area (No Scrollbars) --- */
+#table-area {
+    background: radial-gradient(circle, #3b8a1c 0%, #1e520a 100%);
+    flex-grow: 1;
+    position: relative;
+    overflow: hidden; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+#table-scaler {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform-origin: center center;
+    transition: transform 0.3s ease-out;
+}
+
+#melds-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-content: center;
+    gap: 20px;
+    padding: 40px;
+}
+
+/* --- The Melds --- */
+.meld {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    display: flex;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    transition: background 0.2s, border-color 0.2s;
+    min-height: var(--card-h);
+    min-width: var(--card-w);
+}
+
+.meld.drag-over {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #ffd700;
+}
+
+.meld .card {
+    margin-left: -45px; /* Show slightly more of the underlying cards by default */
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.meld .card:first-child {
+    margin-left: 0;
+}
+
+/* Lift only the specific card hovered without shifting the container */
+.meld .card:hover:not(.is-dragging) {
+    transform: translateY(-15px);
+    z-index: 10;
+}
+
+/* --- Interactive Board Props --- */
+#board-actions {
+    position: absolute;
+    bottom: 20px;
+    right: 30px;
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    z-index: 50;
+}
+
+.table-prop {
+    cursor: pointer;
+    box-shadow: 2px 4px 10px rgba(0,0,0,0.6);
+    transition: transform 0.1s, filter 0.3s;
+    user-select: none;
+}
+
+.table-prop:active:not(.disabled) {
+    transform: translateY(2px) scale(0.95);
+    box-shadow: 1px 2px 5px rgba(0,0,0,0.6);
+}
+
+.table-prop.disabled {
+    filter: grayscale(100%) brightness(0.7);
+    cursor: not-allowed;
+}
+
+#draw-deck {
+    width: var(--card-w);
+    height: var(--card-h);
+    background-color: var(--card-border, #ccc);
+    border: 3px solid white;
+    border-radius: 5px;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 3px black;
+    position: relative;
+}
+
+#draw-deck::before {
+    content: '';
+    position: absolute;
+    top: -4px; left: -4px; right: 2px; bottom: 2px;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: 5px;
+    pointer-events: none;
+}
+
+#pass-coin {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b);
+    border: 3px solid #da6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #5c3a21;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* --- Player Area --- */
+#player-area {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 15px 20px;
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
+    z-index: 10;
+}
+
+.player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.player-header h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+#status-message {
+    font-weight: bold;
+    color: #ffd700;
+}
+
+#reset-turn-btn {
+    padding: 5px 15px;
+    background: #555;
+    color: white;
+    border: 1px solid #777;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#reset-turn-btn:hover { background: #666; }
+
+.hand {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100px;
+    padding-top: 10px;
+    position: relative;
+}
+
+.card.in-hand {
+    margin-left: -35px; 
+    transform-origin: bottom center;
+    transform: translateY(var(--y-offset, 0px)) rotate(var(--rot, 0deg));
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1); /* Added smoothing */
+}
+
+.card.in-hand:first-child { margin-left: 0; }
+
+.card.in-hand:hover:not(.is-dragging) {
+    /* Retain arc rotation but lift up smoothly, removing scale to fix hitbox flickering */
+    transform: translateY(calc(var(--y-offset, 0px) - 20px)) rotate(var(--rot, 0deg));
+    z-index: 10;
+}
+
+/* --- The Cards --- */
+.card {
+    width: var(--card-w);
+    height: var(--card-h);
+    background-color: var(--card-bg, white);
+    color: var(--card-black-text, black);
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    cursor: grab;
+    user-select: none;
+    border: 1px solid var(--card-border, #ccc);
+    box-shadow: 1px 2px 4px rgba(0,0,0,0.5);
+    position: relative;
+    box-sizing: border-box;
+    will-change: transform;
+}
+
+.card .corner {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.card .corner.top-left { top: 4px; left: 4px; }
+.card .corner.bottom-right { bottom: 4px; right: 4px; transform: rotate(180deg); }
+.card .center-suit { font-size: 28px; text-align: center; }
+.card .center-joker { font-size: 12px; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -2px; }
+.card .corner .suit { font-size: 14px; }
+.card.red { color: var(--card-red-text, red); }
+.card.black { color: var(--card-black-text, black); }
+.card.suit-clubs { color: var(--card-club-text, var(--card-black-text)); }
+
+.card.bot-highlight {
+    box-shadow: 0 0 10px 3px cyan;
+    border-color: cyan;
+}
+
+.card.player-highlight {
+    box-shadow: 0 0 12px 3px #ffd700;
+    border-color: #ffd700;
+}
+
+/* --- Dragging Styles --- */
+.card.is-dragging {
+    cursor: grabbing !important;
+    z-index: 9999 !important;
+    box-shadow: 10px 20px 25px rgba(0,0,0,0.6); 
+    pointer-events: none; 
+}
+
+.card.ghost {
+    background: transparent !important;
+    border: 2px dashed rgba(255, 255, 255, 0.4) !important;
+    box-shadow: none !important;
+    pointer-events: none;
+    color: transparent !important;
+}
+
+.card.ghost * {
+    display: none;
+}
+
+/* --- Modals --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.modal-content {
+    background: #222;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    border: 2px solid #555;
+    max-width: 500px;
+}
+
+.score-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.score-table th, .score-table td {
+    border: 1px solid #555;
+    padding: 8px;
+    text-align: center;
+}
+
+.rules-text {
+    text-align: left;
+    font-size: 15px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.rules-text p {
+    margin: 8px 0;
+}
+
+.modal-content button {
+    padding: 10px 20px;
+    cursor: pointer;
+    background: #555;
+    color: white;
+    border: 1px solid #777;
+    border-radius: 4px;
+}
+
+.modal-content button:hover { background: #666; }
+
+/* Style the top buttons */
+.top-controls button {
+    padding: 5px 15px;
+    background: #555;
+    color: white;
+    border: 1px solid #777;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.top-controls button:hover { background: #666; }
+
+/* --- Themes --- */
+body.theme-default {
+    --card-bg: white; --card-border: #ccc;
+    --card-black-text: black; --card-red-text: red;
+    --card-club-text: #004d00; /* Dark forest green */
+}
+body.theme-dark {
+    --card-bg: #222; --card-border: #444;
+    --card-black-text: #00ffff; --card-red-text: #ff00ff;
+    --card-club-text: #00ffaa; /* Neon mint green */
+}
+body.theme-vintage {
+    --card-bg: #f5eedc; --card-border: #8b5a2b;
+    --card-black-text: #3e2723; --card-red-text: #b71c1c;
+    --card-club-text: #2e4a2e; /* Muted earthy green */
+}
+body.theme-geology {
+    --card-bg: #ecece7; --card-border: #4a4a4a;
+    --card-black-text: #2f4f4f; 
+    --card-red-text: #cc5500;   
+    --card-club-text: #1b5e20; /* Deep malachite green */
+}
