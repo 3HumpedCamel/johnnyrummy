@@ -83,6 +83,12 @@ class GameState {
     }
 }
 
+function escapeHTML(str) {
+    if (!str) return "";
+    return str.replace(/[&<>'"]/g, tag => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[tag]));
+}
 function _isValidMeldBase(cards) {
     if (cards.length < 3) return false;
     let isBook = true;
@@ -246,9 +252,7 @@ async function renderHighScores() {
         if (scores.length === 0) {
             list.innerHTML = "<li>No global scores yet. Be the first!</li>";
         } else {
-            list.innerHTML = scores.map(s => 
-                `<li><strong>${s.score}</strong> points - ${s.player_name} (${s.play_date})</li>`
-            ).join('');
+            list.innerHTML = scores.map(s => `<li><strong>${s.score}</strong> points - ${escapeHTML(s.player_name)} (${s.play_date})</li>`).join('');
         }
     } catch (err) {
         console.error("Failed to fetch global scores:", err);

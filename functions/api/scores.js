@@ -3,7 +3,6 @@ export async function onRequest(context) {
 
     if (request.method === "GET") {
         try {
-            // Fetch top 10 lowest scores (lowest is best in Rummy)
             const { results } = await env.DB.prepare(
                 "SELECT player_name, score, date(date) as play_date FROM rummy_scores ORDER BY score ASC LIMIT 10"
             ).all();
@@ -16,13 +15,18 @@ export async function onRequest(context) {
     if (request.method === "POST") {
         try {
             const body = await request.json();
-            if (!body.player_name || typeof body.score !== 'number') {
-                return new Response("Bad Request", { status: 400 });
+            
+            // Added body.player_name.length > 50 to the rejection criteria
+            if (!body.player_name || typeof body.score !== 'number' || body.score < -200 || body.score > 2000 || body.player_name.length > 50) {
+                return new Response("Bad Request: Invalid name or score", { status: 400 });
             }
+            
+            // Force the backend to truncate it just in case, before inserting
+            const safeName = body.player_name.substring(0, 50);
             
             await env.DB.prepare(
                 "INSERT INTO rummy_scores (player_name, score) VALUES (?, ?)"
-            ).bind(body.player_name, body.score).run();
+            ).bind(safeName, body.score).run();
             
             return new Response("Score saved", { status: 200 });
         } catch (e) {
