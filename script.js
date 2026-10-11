@@ -349,6 +349,22 @@ function attachPointerDrag(el, card, sourceInfo) {
             render(); 
         }
     });
+
+    // NEW: pointercancel listener added here to catch OS-level touch interruptions
+    el.addEventListener('pointercancel', (e) => {
+        if (!draggingCardEl || draggingCardEl !== el) return;
+        el.releasePointerCapture(e.pointerId);
+        
+        // Clean up the ghost card
+        if (dragGhostEl && dragGhostEl.parentNode) {
+            dragGhostEl.parentNode.removeChild(dragGhostEl);
+        }
+        draggingCardEl = null;
+        dragGhostEl = null;
+        
+        // Snap everything back to the pre-drag state
+        render(); 
+    });
 }
 
 function createCardElement(card, sourceInfo) {
