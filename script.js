@@ -726,6 +726,9 @@ if (typeof document !== 'undefined') {
                 game.deal();
                 game.currentTurn = game.startingPlayer; 
                 game.hasDrawnThisTurn = false;
+                
+                // ADD THIS LINE: Update the round counter UI for the next round
+                document.getElementById('round-number').textContent = game.round;
             }
             
             savePreTurnState();
