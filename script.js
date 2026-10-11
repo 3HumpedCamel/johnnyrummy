@@ -632,7 +632,18 @@ if (typeof document !== 'undefined') {
         
         game.table.forEach(m => m.forEach(c => c.isNewFromBot = false));
         
-        if (!isValidTable(game.table)) {
+        let tableIsValid = true;
+        game.table.forEach((meld, index) => {
+            const meldEl = document.querySelector(`.meld[data-index="${index}"]`);
+            if (!isValidMeld(meld)) {
+                if (meldEl) meldEl.classList.add('invalid-meld');
+                tableIsValid = false;
+            } else {
+                if (meldEl) meldEl.classList.remove('invalid-meld');
+            }
+        });
+
+        if (!tableIsValid) {
             updateStatus("Invalid table configuration! Fix it or reset turn.");
             return;
         }

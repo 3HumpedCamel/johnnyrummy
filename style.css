@@ -171,6 +171,18 @@ body {
     z-index: 10;
 }
 
+.meld.invalid-meld {
+    border-color: #ff4444 !important;
+    background: rgba(255, 0, 0, 0.2) !important;
+    box-shadow: 0 0 15px 5px rgba(255, 0, 0, 0.5);
+    animation: pulse-error 1s infinite alternate;
+}
+
+@keyframes pulse-error {
+    from { box-shadow: 0 0 10px 2px rgba(255, 0, 0, 0.5); }
+    to { box-shadow: 0 0 20px 8px rgba(255, 0, 0, 0.8); }
+}
+
 /* --- Interactive Board Props --- */
 #board-actions {
     position: absolute;
