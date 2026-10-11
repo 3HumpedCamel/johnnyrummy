@@ -951,6 +951,53 @@ function tryToPlayFromHand(botIndex) {
         }
     }
     
+    // Move 7: Relocate a "Free" Joker to extend another meld and unlock a hand card
+    for (let mIdxA = 0; mIdxA < game.table.length; mIdxA++) {
+        let meldA = game.table[mIdxA];
+        if (meldA.length <= 3) continue; // Meld A must survive with at least 3 cards
+
+        for (let cIdxA = 0; cIdxA < meldA.length; cIdxA++) {
+            let candidateJoker = meldA[cIdxA];
+            if (!candidateJoker.isJoker) continue;
+
+            // Temporarily remove the Joker from Meld A
+            meldA.splice(cIdxA, 1);
+            if (isValidMeld(meldA)) { 
+                
+                // Try moving the freed Joker to any OTHER meld (Meld B)
+                for (let mIdxB = 0; mIdxB < game.table.length; mIdxB++) {
+                    if (mIdxA === mIdxB) continue;
+                    let meldB = game.table[mIdxB];
+                    if (isBookMeld(meldB)) continue; // Per bot heuristics, avoid Jokers in books
+
+                    // Add Joker to Meld B
+                    meldB.push(candidateJoker);
+                    if (isValidMeld(meldB)) {
+                        
+                        // Can we now play a card from our hand onto this extended Meld B?
+                        for (let i = hand.length - 1; i >= 0; i--) {
+                            let handCard = hand[i];
+                            if (handCard.isJoker) continue; 
+
+                            meldB.push(handCard);
+                            if (isValidMeld(meldB)) {
+                                // Success! We successfully relocated the Joker and played a card.
+                                candidateJoker.isNewFromBot = true;
+                                handCard.isNewFromBot = true;
+                                hand.splice(i, 1);
+                                return true; // Restart the cascade 
+                            }
+                            meldB.pop(); // Revert handCard test
+                        }
+                    }
+                    meldB.pop(); // Revert Joker addition test
+                }
+            }
+            // Revert Meld A removal if we didn't find a valid play
+            meldA.splice(cIdxA, 0, candidateJoker);
+        }
+    }
+    
     return false; // Can't make any legal plays
 }
 
